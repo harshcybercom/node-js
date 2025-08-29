@@ -176,6 +176,31 @@ class AdminController {
             res.status(500).json({ error: err.message });
         }
     }
+
+    // Update user
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            const { name, email, is_active } = req.body;
+
+            await User.update({ name, email, is_active }, { where: { id } });
+
+            res.json({ message: "User updated successfully" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    // Delete user
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            await User.destroy({ where: { id } });
+            res.json({ message: "User deleted successfully" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
 }
 
 module.exports = new AdminController();
