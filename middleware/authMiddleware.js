@@ -3,13 +3,22 @@ const User = require('../modules/admin/models/User');
 
 async function authMiddleware(req, res, next) {
     try {
-        const authHeader = req.headers['authorization'];
+        let token = null;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: "Authorization token required" });
+        // First try Authorization header
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
         }
 
-        const token = authHeader.split(' ')[1];
+        // If no header token, fallback to session token (EJS flow)
+        if (!token && req.session && req.session.token) {
+            token = req.session.token;
+        }
+
+        if (!token) {
+            return res.status(401).json({ error: "Authorization token required" });
+        }
 
         // Find token in DB
         const apiToken = await ApiToken.findOne({
@@ -17,7 +26,7 @@ async function authMiddleware(req, res, next) {
             include: [{ model: User }]
         });
 
-        if (!apiToken) {
+        if (!apiToken || !apiToken.User) {
             return res.status(401).json({ error: "Invalid or expired token" });
         }
 
@@ -26,7 +35,7 @@ async function authMiddleware(req, res, next) {
             return res.status(401).json({ error: "Token expired" });
         }
 
-        // Attach user info to request
+        // Attach user info
         req.user = apiToken.User;
 
         next();

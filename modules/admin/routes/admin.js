@@ -3,11 +3,21 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const authMiddleware = require('../../../middleware/authMiddleware');
 
-// /admin/admin
-router.get('/list', authMiddleware, adminController.list);
-router.get('/', authMiddleware, adminController.dashboard);
+// Register
+router.get('/register', adminController.showRegister);
+router.post('/register', adminController.register);
 
-router.post('/create', adminController.create);
+// Login page + auth
+router.get('/login', adminController.showLogin);
 router.post('/login', adminController.login);
 
+// Logout
+router.get('/logout', authMiddleware, adminController.logout);
+
+// Protected routes
+router.get('/dashboard', authMiddleware, adminController.dashboard);
+router.get('/list', authMiddleware, adminController.list);
+
+// User creation (API only)
+router.post('/create', adminController.create);
 module.exports = router;

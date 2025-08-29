@@ -2,6 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const session = require('express-session');
 
 class Ccc {
     constructor(port = 3000) {
@@ -10,12 +11,29 @@ class Ccc {
 
         this.modulesPath = path.join(__dirname, "modules");
 
-        this.middlewares();
+        this.configure();
         this.load();
     }
 
-    middlewares() {
+    configure() {
+        // Middleware
         this.app.use(express.json());
+        this.app.use(express.urlencoded({ extended: true })); // for form submissions
+
+        // Session setup
+        this.app.use(session({
+            secret: process.env.SESSION_SECRET || 'supersecretkey',
+            resave: false,
+            saveUninitialized: true,
+            cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
+        }));
+
+        // EJS setup
+        this.app.set('view engine', 'ejs');
+        this.app.set('views', path.join(__dirname, 'views'));
+
+        // Static assets (css/js/images)
+        this.app.use(express.static(path.join(__dirname, 'public')));
     }
 
     load() {
@@ -73,13 +91,6 @@ class Ccc {
                 }
             }
         }
-    }
-
-    // Dynamically load all route files inside routes/ folder
-    loadRoutes() {
-        const routesPath = path.join(__dirname, 'routes');
-        const router = require('./modules/catalog/routes/user.js');
-        this.app.use('/user', router);
     }
 
     start() {
