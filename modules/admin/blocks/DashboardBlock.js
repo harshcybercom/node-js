@@ -1,18 +1,22 @@
-const BaseBlock = require("./BaseBlock");
+const Block = require("./Block");
+const User = require("../models/User");
 
-class DashboardBlock extends BaseBlock {
-    constructor(req, extra = {}) {
-        super(req);
+class DashboardBlock extends Block {
+    _template = "dashboard";
+    constructor(req, res, extra = {}) {
+        super(req, res);
         this.extra = extra;
     }
     
-    getTemplate() {
-        return "dashboard";
+    async getData() {
+        const user = this.extra.user || this.req.user || null;
+        const users = await this._getUsers();
+        return { user, users };
     }
 
-    getData() {
-        const user = this.extra.user || this.req.user || null;
-        return { user };
+    async _getUsers() {
+        // Example: using Sequelize
+        return await User.findAll({ raw: true });
     }
 }
 

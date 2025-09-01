@@ -1,9 +1,7 @@
-const BaseBlock = require("./BaseBlock");
+const Block = require("./Block");
 
-class LoginBlock extends BaseBlock {
-    getTemplate() {
-        return "login"; // views/admin/login.ejs
-    }
+class LoginBlock extends Block {
+    _template = "login";
 
     getData() {
         return { error: this.req.query.error || null };

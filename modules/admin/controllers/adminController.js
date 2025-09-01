@@ -5,6 +5,7 @@ const ApiToken = require('../models/ApiToken');
 const LoginBlock = require("../blocks/LoginBlock");
 const RegisterBlock = require("../blocks/RegisterBlock");
 const DashboardBlock = require("../blocks/DashboardBlock");
+const Block = require("../blocks/Block");
 
 class AdminController {
     async index(req, res) {
@@ -19,11 +20,12 @@ class AdminController {
                 return res.status(400).json({ error: "Name, email, and password are required" });
             }
 
+            const hashedPassword = await bcrypt.hash(password, 10);
             // Create new user
             const user = await User.create({
                 name,
                 email,
-                password_hash: password // ⚠️ should hash before storing
+                password_hash: hashedPassword
             });
 
             const token = Math.random().toString(36).substring(2);
@@ -57,8 +59,8 @@ class AdminController {
     }
 
     async showRegister(req, res) {
-        const block = new RegisterBlock(req);
-        res.render(block.getTemplate(), block.getData());
+        const block = new RegisterBlock(req, res);
+        block.render();
     }
 
     async register(req, res) {
@@ -66,14 +68,14 @@ class AdminController {
             const { name, email, password } = req.body;
 
             if (!name || !email || !password) {
-                const block = new RegisterBlock(req, { error: "All fields are required" });
-                return res.render(block.getTemplate(), block.getData());
+                const block = new RegisterBlock(req, res, { error: "All fields are required" });
+                block.render();
             }
 
             const existing = await User.findOne({ where: { email } });
             if (existing) {
-                const block = new RegisterBlock(req, { error: "Email already registered" });
-                return res.render(block.getTemplate(), block.getData());
+                const block = new RegisterBlock(req, res, { error: "Email already registered" });
+                block.render();
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -95,34 +97,34 @@ class AdminController {
             req.session.token = token;
             res.redirect('/admin/admin/dashboard');
         } catch (err) {
-            const block = new RegisterBlock(req, { error: err.message });
-            res.render(block.getTemplate(), block.getData());
+            const block = new RegisterBlock(req, res, { error: err.message });
+            block.render();
         }
     }
 
     async showLogin(req, res) {
-        const block = new LoginBlock(req);
-        res.render(block.getTemplate(), block.getData());
+        const block = new LoginBlock(req, res);
+        block.render();
     }
 
     async login(req, res) {
         try {
             const { email, password } = req.body;
             if (!email || !password) {
-                const block = new LoginBlock(req, { error: "Email and password are required" });
-                return res.render(block.getTemplate(), block.getData());
+                const block = new LoginBlock(req, res, { error: "Email and password are required" });
+                block.render();
             }
     
             const user = await User.findOne({ where: { email } });
             if (!user) {
-                const block = new LoginBlock(req, { error: "User not found" });
-                return res.render(block.getTemplate(), block.getData());
+                const block = new LoginBlock(req, res, { error: "User not found" });
+                block.render();
             }
     
             const isMatch = await bcrypt.compare(password, user.password_hash);
             if (!isMatch) {
-                const block = new LoginBlock(req, { error: "Invalid credentials" });
-                return res.render(block.getTemplate(), block.getData());
+                const block = new LoginBlock(req, res, { error: "Invalid credentials" });
+                block.render();
             }
     
             // ✅ on success create token + session
@@ -137,8 +139,8 @@ class AdminController {
     
             res.redirect("/admin/admin/dashboard");
         } catch (err) {
-            const block = new LoginBlock(req, { error: err.message });
-            res.render(block.getTemplate(), block.getData());
+            const block = new LoginBlock(req, res, { error: err.message });
+            block.render();
         }
     }
 
@@ -146,9 +148,9 @@ class AdminController {
         if (!req.user) {
             return res.redirect("/admin/admin/login");
         }
-    
-        const block = new DashboardBlock(req, { user: req.user });
-        res.render(block.getTemplate(), block.getData());
+
+        const block = new DashboardBlock(req, res);
+        block.render();
     }
 
     async logout(req, res) {

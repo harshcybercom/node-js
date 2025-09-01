@@ -32,93 +32,15 @@
             <input type="hidden" name="id" />
             <input type="text" name="name" placeholder="Name" required />
             <input type="email" name="email" placeholder="Email" required />
-            <input type="password" name="password" placeholder="Password" required />
+            <input type="password" name="password" placeholder="Password" />
             <label><input type="checkbox" name="is_active" /> Active</label>
             <button type="submit">Save</button>
             <button type="button" onclick="hideForm()">Cancel</button>
         </form>
     </div>
 
-    <script>
-        async function fetchUsers() {
-            const res = await fetch('/admin/admin/users');
-            const data = await res.json();
-            const tbody = document.querySelector('#usersTable tbody');
-            tbody.innerHTML = '';
-            data.users.forEach(user => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${user.id}</td>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                        <td>${user.is_active ? 'Yes' : 'No'}</td>
-                        <td>${new Date(user.created_at).toLocaleString()}</td>
-                        <td class="actions">
-                            <button onclick='editUser(${JSON.stringify(user)})'>Edit</button>
-                            <button onclick='deleteUser(${user.id})'>Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function deleteUser(id) {
-            if (confirm("Delete this user?")) {
-                await fetch(`/admin/admin/users/${id}`, { method: 'DELETE' });
-                fetchUsers();
-            }
-        }
-
-        function showCreateForm() {
-            document.getElementById('formTitle').innerText = "Create User";
-            document.getElementById('userForm').reset();
-            document.getElementById('formContainer').style.display = 'block';
-        }
-
-        function editUser(user) {
-            document.getElementById('formTitle').innerText = "Edit User";
-            const form = document.getElementById('userForm');
-            form.id.value = user.id;
-            form.name.value = user.name;
-            form.email.value = user.email;
-            form.is_active.checked = user.is_active;
-            document.getElementById('formContainer').style.display = 'block';
-        }
-
-        function hideForm() {
-            document.getElementById('formContainer').style.display = 'none';
-        }
-
-        document.getElementById('userForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const data = {
-                name: form.name.value,
-                email: form.email.value,
-                is_active: form.is_active.checked
-            };
-
-            if (form.id.value) {
-                await fetch(`/admin/admin/users/${form.id.value}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            } else {
-                await fetch('/admin/admin/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            }
-
-            hideForm();
-            fetchUsers();
-        };
-
-        fetchUsers();
-    </script>
-
     <p><a href="/admin/admin/logout">Logout</a></p>
+
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>

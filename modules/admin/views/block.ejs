@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #f0f0f0; }
+        .actions button { margin: 0 5px; }
+    </style>
+</head>
+<body>
+    hello
+
+    <p>Welcome, <%= me %></p>
+
+    <pre>
+        <%= JSON.stringify(Object.getOwnPropertyNames(Object.getPrototypeOf(me))) %>
+    </pre>
+</body>
+</html>

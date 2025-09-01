@@ -1,13 +1,10 @@
-const BaseBlock = require("./BaseBlock");
+const Block = require("./Block");
 
-class RegisterBlock extends BaseBlock {
-    constructor(req, extra = {}) {
-        super(req);
+class RegisterBlock extends Block {
+    _template = "register";
+    constructor(req, res, extra = {}) {
+        super(req, res);
         this.extra = extra;
-    }
-
-    getTemplate() {
-        return "register";
     }
 
     getData() {
