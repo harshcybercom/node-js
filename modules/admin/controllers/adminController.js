@@ -6,6 +6,7 @@ const LoginBlock = require("../blocks/LoginBlock");
 const RegisterBlock = require("../blocks/RegisterBlock");
 const DashboardBlock = require("../blocks/DashboardBlock");
 const Block = require("../blocks/Block");
+const LayoutBlock = require("../blocks/LayoutBlock");
 
 class AdminController {
     async index(req, res) {
@@ -59,8 +60,15 @@ class AdminController {
     }
 
     async showRegister(req, res) {
-        const block = new RegisterBlock(req, res);
-        block.render();
+        const layout = new LayoutBlock(req, res);
+        const content = layout.child("content");
+
+        const registerBlock = new RegisterBlock(req, res);
+        content.child("register", registerBlock);
+
+        layout.setTitle("Register - Admin");
+
+        await layout.render();
     }
 
     async register(req, res) {
@@ -69,13 +77,13 @@ class AdminController {
 
             if (!name || !email || !password) {
                 const block = new RegisterBlock(req, res, { error: "All fields are required" });
-                block.render();
+                return block.render();
             }
 
             const existing = await User.findOne({ where: { email } });
             if (existing) {
                 const block = new RegisterBlock(req, res, { error: "Email already registered" });
-                block.render();
+                return block.render();
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -103,8 +111,15 @@ class AdminController {
     }
 
     async showLogin(req, res) {
-        const block = new LoginBlock(req, res);
-        block.render();
+        const layout = new LayoutBlock(req, res);
+        const content = layout.child("content");
+
+        const loginBlock = new LoginBlock(req, res);
+        content.child("login", loginBlock);
+
+        layout.setTitle("Login - Admin");
+
+        await layout.render();
     }
 
     async login(req, res) {
@@ -112,19 +127,19 @@ class AdminController {
             const { email, password } = req.body;
             if (!email || !password) {
                 const block = new LoginBlock(req, res, { error: "Email and password are required" });
-                block.render();
+                return block.render();
             }
     
             const user = await User.findOne({ where: { email } });
             if (!user) {
                 const block = new LoginBlock(req, res, { error: "User not found" });
-                block.render();
+                return block.render();
             }
     
             const isMatch = await bcrypt.compare(password, user.password_hash);
             if (!isMatch) {
                 const block = new LoginBlock(req, res, { error: "Invalid credentials" });
-                block.render();
+                return block.render();
             }
     
             // ✅ on success create token + session
@@ -149,8 +164,16 @@ class AdminController {
             return res.redirect("/admin/admin/login");
         }
 
-        const block = new DashboardBlock(req, res);
-        block.render();
+        const layout = new LayoutBlock(req, res);
+        const content = layout.child("content");
+
+        const dashboardBlock = new DashboardBlock(req, res, { user: req.user });
+        content.child("dashboard", dashboardBlock);
+
+        layout.setTitle("Dashboard - Admin");
+        layout.addScript("/js/dashboard.js");
+
+        await layout.render();
     }
 
     async logout(req, res) {

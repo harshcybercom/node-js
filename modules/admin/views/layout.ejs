@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <% if (styles && styles.length) { styles.forEach(file => { %>
+        <link rel="stylesheet" href="<%= file %>">
+    <% }) } %>
+</head>
+<body>
+    <%- (children && children.header) ? children.header : "" %>
+    <main>
+        <%- (children && children.content) ? children.content : "" %>
+    </main>
+    <%- (children && children.footer) ? children.footer : "" %>
+
+    <% if (scripts && scripts.length) { scripts.forEach(file => { %>
+        <script src="<%= file %>"></script>
+    <% }) } %>
+</body>
+</html>

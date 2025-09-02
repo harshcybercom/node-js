@@ -1,3 +1,6 @@
+const ejs = require("ejs");
+const path = require("path");
+
 class Block {
     _template = 'block.ejs';
     _children = {};
@@ -5,7 +8,7 @@ class Block {
         this.req = req;
         this.res = res;
     }
-    
+
     template(template = null) {
         if (template) {
             this._template = template;
@@ -56,12 +59,45 @@ class Block {
         return 'Ccc';
     }
 
+    async block(blockName) {
+        if (!blockName) {
+            throw new Error("Block name is required");
+        }
+        return new blockName(this.req, this.res);
+    }
+
     async render() {
+        const html = await this.renderToString();
+        this.res.send(html);
+    }
+
+    async renderToString() {
         const data = await this.getData();
-        this.res.render(this._template, {
-            me: this,
-            ...data,
-        });
+
+        const childrenHtml = {};
+        for (const [key, child] of Object.entries(this._children)) {
+            childrenHtml[key] = await child.renderToString();
+        }
+
+        const viewPath = path.join(
+            this.res.app.get("views"),
+            this._template + ".ejs"
+        );
+
+        return await ejs.renderFile(
+            viewPath,
+            {
+                me: this,
+                children: childrenHtml,
+                ...data
+            },
+            { async: false }
+        );
+    }
+
+    async renderChild(name) {
+        const child = this._children[name];
+        return child ? await child.renderToString() : "";
     }
 }
 

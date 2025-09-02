@@ -1,46 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard</title>
-    <style>
-        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background: #f0f0f0; }
-        .actions button { margin: 0 5px; }
-    </style>
-</head>
-<body>
-    <h2>Welcome, <%= user.name %></h2>
-    <p>Email: <%= user.email %></p>
+<h2>Welcome, <%= user ? user.name : "Guest" %></h2>
+<p>Email: <%= user ? user.email : "N/A" %></p>
 
-    <h3>User Management</h3>
+<h3>User Management</h3>
 
-    <table id="usersTable">
-        <thead>
-            <tr>
-                <th>ID</th><th>Name</th><th>Email</th><th>Active</th><th>Created At</th><th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<table id="usersTable">
+    <thead>
+        <tr>
+            <th>ID</th><th>Name</th><th>Email</th>
+            <th>Active</th><th>Created At</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
-    <button onclick="showCreateForm()">Add User</button>
+<button onclick="showCreateForm()">Add User</button>
 
-    <div id="formContainer" style="display:none;">
-        <h3 id="formTitle">Create User</h3>
-        <form id="userForm">
-            <input type="hidden" name="id" />
-            <input type="text" name="name" placeholder="Name" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="password" name="password" placeholder="Password" />
-            <label><input type="checkbox" name="is_active" /> Active</label>
-            <button type="submit">Save</button>
-            <button type="button" onclick="hideForm()">Cancel</button>
-        </form>
-    </div>
+<div id="formContainer" style="display:none;">
+    <h3 id="formTitle">Create User</h3>
+    <form id="userForm">
+        <input type="hidden" name="id" />
+        <input type="text" name="name" placeholder="Name" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" />
+        <label><input type="checkbox" name="is_active" /> Active</label>
+        <button type="submit">Save</button>
+        <button type="button" onclick="hideForm()">Cancel</button>
+    </form>
+</div>
 
-    <p><a href="/admin/admin/logout">Logout</a></p>
-
-    <script src="/js/dashboard.js"></script>
-</body>
-</html>
+<p><a href="/admin/admin/logout">Logout</a></p>
