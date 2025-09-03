@@ -1,0 +1,30 @@
+<h2>Welcome, <%= user ? user.name : "Guest" %></h2>
+<p>Email: <%= user ? user.email : "N/A" %></p>
+
+<h3>API User Management</h3>
+
+<table id="apiUsersTable">
+    <thead>
+        <tr>
+            <th>ID</th><th>Name</th><th>Email</th>
+            <th>Created At</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<button onclick="showCreateForm()">Add API User</button>
+
+<div id="formContainer" style="display:none;">
+    <h3 id="formTitle">Create API User</h3>
+    <form id="apiUserForm">
+        <input type="hidden" name="id" />
+        <input type="text" name="name" placeholder="Name" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" />
+        <button type="submit">Save</button>
+        <button type="button" onclick="hideForm()">Cancel</button>
+    </form>
+</div>
+
+<p><a href="/apiuser/logout">Logout</a></p>
