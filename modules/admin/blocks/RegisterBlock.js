@@ -1,4 +1,4 @@
-const Block = require("./Block");
+const Block = require("../../core/blocks/Block");
 
 class RegisterBlock extends Block {
     _template = "register";

@@ -1,4 +1,4 @@
-const Block = require("./Block");
+const Block = require("../../core/blocks/Block");
 const User = require("../models/User");
 
 class DashboardBlock extends Block {

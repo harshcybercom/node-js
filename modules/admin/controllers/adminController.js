@@ -5,8 +5,7 @@ const ApiToken = require('../models/ApiToken');
 const LoginBlock = require("../blocks/LoginBlock");
 const RegisterBlock = require("../blocks/RegisterBlock");
 const DashboardBlock = require("../blocks/DashboardBlock");
-const Block = require("../blocks/Block");
-const LayoutBlock = require("../blocks/LayoutBlock");
+const LayoutBlock = require("../../core/blocks/LayoutBlock");
 
 class AdminController {
     async index(req, res) {

@@ -30,7 +30,11 @@ class Ccc {
 
         // EJS setup
         this.app.set('view engine', 'ejs');
-        this.app.set('views', path.join(__dirname, 'modules/admin/views'));
+        // this.app.set('views', path.join(__dirname, 'modules/admin/views'));
+        this.app.set("views", [
+            path.join(__dirname, "modules/core/views"),
+            path.join(__dirname, "modules/admin/views"),
+        ]);
 
         // Static assets (css/js/images)
         this.app.use(express.static(path.join(__dirname, 'public')));

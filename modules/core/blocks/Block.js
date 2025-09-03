@@ -73,27 +73,46 @@ class Block {
 
     async renderToString() {
         const data = await this.getData();
-
+    
+        // resolve children first
         const childrenHtml = {};
         for (const [key, child] of Object.entries(this._children)) {
             childrenHtml[key] = await child.renderToString();
         }
 
-        const viewPath = path.join(
-            this.res.app.get("views"),
-            this._template + ".ejs"
-        );
-
+        // Get the views directories
+        const viewsDirs = this.res.app.get("views");
+        let templatePath = this._template + ".ejs";
+        
+        // Try to find the template in each views directory
+        const fs = require('fs');
+        let fullTemplatePath = null;
+        
+        for (const viewsDir of viewsDirs) {
+            const candidatePath = path.join(viewsDir, templatePath);
+            if (fs.existsSync(candidatePath)) {
+                fullTemplatePath = candidatePath;
+                break;
+            }
+        }
+        
+        if (!fullTemplatePath) {
+            throw new Error(`Template not found: ${templatePath} in any of the views directories: ${viewsDirs.join(', ')}`);
+        }
+    
         return await ejs.renderFile(
-            viewPath,
+            fullTemplatePath,
             {
                 me: this,
                 children: childrenHtml,
-                ...data
+                ...data,
             },
-            { async: false }
+            {
+                async: false,
+            }
         );
     }
+    
 
     async renderChild(name) {
         const child = this._children[name];
