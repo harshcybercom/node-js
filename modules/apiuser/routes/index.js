@@ -6,14 +6,33 @@ const ApiUserController = require("../controllers/apiUserController");
 const apiUserController = new ApiUserController();
 
 // Authentication routes (static methods)
-router.get("/login", ApiUserController.showLogin);
-router.post("/login", ApiUserController.login);
+router.get("/login", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.showLogin(req, res);
+});
+router.post("/login", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.login(req, res);
+});
 
-router.get("/register", ApiUserController.showRegister);
-router.post("/register", ApiUserController.register);
+router.get("/register", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.showRegister(req, res);
+});
+router.post("/register", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.register(req, res);
+});
 
-router.get("/dashboard", ApiUserController.dashboard);
-router.get("/logout", ApiUserController.logout);
+// router.get("/dashboard", ApiUserController.dashboard);
+router.get("/dashboard", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.dashboard(req, res);
+});
+router.get("/logout", (req, res) => {
+    const controller = new ApiUserController(req, res);
+    controller.logout(req, res);
+});
 
 // API Index
 router.get("/", apiUserController.index);

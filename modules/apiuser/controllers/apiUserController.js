@@ -5,9 +5,12 @@ const ApiUserToken = require("../models/ApiUserToken");
 const LoginBlock = require("../blocks/Login");
 const RegisterBlock = require("../blocks/Register");
 const DashboardBlock = require("../blocks/Dashboard");
-const LayoutBlock = require("../../core/blocks/LayoutBlock");
+const Controller = require("../../core/controllers/controller");
 
-class ApiUserController {
+class ApiUserController extends Controller {
+    constructor(req, res) {
+        super(req, res);
+    }
     // API Index
     async index(req, res) {
         res.json({ message: "Welcome to API User Index" });
@@ -100,41 +103,42 @@ class ApiUserController {
     }
 
     // GET /apiuser/login (form)
-    static async showLogin(req, res) {
-        const layout = new LayoutBlock(req, res);
+    async showLogin(req, res) {
+        const layout = this.layout();
+
         const content = layout.child("content");
 
-        const loginBlock = new LoginBlock(req, res);
+        const loginBlock = this.block(LoginBlock);
         content.child("login", loginBlock);
 
         layout.setTitle("Login - API User");
 
-        await layout.render();
+        return this.render();
     }
 
     // POST /apiuser/login
-    static async login(req, res) {
+    async login(req, res) {
         try {
             const { email, password } = req.body;
 
             if (!email || !password) {
-                const layout = new LayoutBlock(req, res);
+                const layout = this.layout();
                 const content = layout.child("content");
-                const loginBlock = new LoginBlock(req, res, { error: "Email and password are required" });
+                const loginBlock = this.block(LoginBlock, { error: "Email and password are required" });
                 content.child("login", loginBlock);
                 layout.setTitle("Login - API User");
-                return await layout.render();
+                return this.render();
             }
 
             const user = await ApiUser.findOne({ where: { email } });
 
             if (!user || !(await bcrypt.compare(password, user.password))) {
-                const layout = new LayoutBlock(req, res);
+                const layout = this.layout();
                 const content = layout.child("content");
-                const loginBlock = new LoginBlock(req, res, { error: "Invalid credentials" });
+                const loginBlock = this.block(LoginBlock, { error: "Invalid credentials" });
                 content.child("login", loginBlock);
                 layout.setTitle("Login - API User");
-                return await layout.render();
+                return this.render();
             }
 
             // Create token and save session
@@ -149,50 +153,50 @@ class ApiUserController {
             req.session.token = token;
             return res.redirect("/apiuser/dashboard");
         } catch (err) {
-            const layout = new LayoutBlock(req, res);
+            const layout = this.layout();
             const content = layout.child("content");
-            const loginBlock = new LoginBlock(req, res, { error: err.message });
+            const loginBlock = this.block(LoginBlock, { error: err.message });
             content.child("login", loginBlock);
             layout.setTitle("Login - API User");
-            return await layout.render();
+            return this.render();
         }
     }
 
     // GET /apiuser/register (form)
-    static async showRegister(req, res) {
-        const layout = new LayoutBlock(req, res);
+    async showRegister(req, res) {
+        const layout = this.layout();
         const content = layout.child("content");
 
-        const registerBlock = new RegisterBlock(req, res);
+        const registerBlock = this.block(RegisterBlock);
         content.child("register", registerBlock);
 
         layout.setTitle("Register - API User");
 
-        await layout.render();
+        return this.render();
     }
 
     // POST /apiuser/register
-    static async register(req, res) {
+    async register(req, res) {
         try {
             const { name, email, password } = req.body;
 
             if (!name || !email || !password) {
-                const layout = new LayoutBlock(req, res);
+                const layout = this.layout();
                 const content = layout.child("content");
-                const registerBlock = new RegisterBlock(req, res, { error: "All fields are required" });
+                const registerBlock = this.block(RegisterBlock, { error: "All fields are required" });
                 content.child("register", registerBlock);
                 layout.setTitle("Register - API User");
-                return await layout.render();
+                return this.render();
             }
 
             const existing = await ApiUser.findOne({ where: { email } });
             if (existing) {
-                const layout = new LayoutBlock(req, res);
+                const layout = this.layout();
                 const content = layout.child("content");
-                const registerBlock = new RegisterBlock(req, res, { error: "Email already registered" });
+                const registerBlock = this.block(RegisterBlock, { error: "Email already registered" });
                 content.child("register", registerBlock);
                 layout.setTitle("Register - API User");
-                return await layout.render();
+                return this.render();
             }
 
             const hash = await bcrypt.hash(password, 10);
@@ -215,17 +219,17 @@ class ApiUserController {
             req.session.token = token;
             return res.redirect("/apiuser/dashboard");
         } catch (err) {
-            const layout = new LayoutBlock(req, res);
+            const layout = this.layout();
             const content = layout.child("content");
-            const registerBlock = new RegisterBlock(req, res, { error: err.message });
+            const registerBlock = this.block(RegisterBlock, { error: err.message });
             content.child("register", registerBlock);
             layout.setTitle("Register - API User");
-            return await layout.render();
+            return this.render();
         }
     }
 
     // GET /apiuser/dashboard
-    static async dashboard(req, res) {
+    async dashboard(req, res) {
         if (!req.session.apiUserId) {
             return res.redirect("/apiuser/login");
         }
@@ -235,23 +239,24 @@ class ApiUserController {
                 attributes: { exclude: ['password'] }
             });
 
-            const layout = new LayoutBlock(req, res);
+            // console.log('controller');
+            const layout = this.layout();
             const content = layout.child("content");
 
-            const dashboardBlock = new DashboardBlock(req, res, { user });
+            const dashboardBlock = this.block(DashboardBlock, { user });
             content.child("dashboard", dashboardBlock);
 
             layout.setTitle("Dashboard - API User");
             layout.addScript("/js/apiuser-dashboard.js");
 
-            await layout.render();
+            return this.render();
         } catch (err) {
             res.redirect("/apiuser/login");
         }
     }
 
     // GET /apiuser/logout
-    static async logout(req, res) {
+    async logout(req, res) {
         try {
             if (req.session && req.session.token) {
                 const token = req.session.token;
