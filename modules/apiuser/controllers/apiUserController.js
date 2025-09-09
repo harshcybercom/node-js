@@ -19,10 +19,10 @@ class ApiUserController extends Controller {
     // Create new API user (CRUD - Create)
     async create(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, is_active } = req.body;
 
-            if (!name || !email || !password) {
-                return res.status(400).json({ error: "Name, email, and password are required" });
+            if (!name || !email || !password || !is_active) {
+                return res.status(400).json({ error: "Name, email, password, and status are required" });
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,7 +31,8 @@ class ApiUserController extends Controller {
             const user = await ApiUser.create({
                 name,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                is_active: parseInt(is_active)
             });
 
             const token = crypto.randomBytes(32).toString('hex');
@@ -70,14 +71,19 @@ class ApiUserController extends Controller {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const { name, email } = req.body;
+            const { name, email, is_active } = req.body;
 
             const user = await ApiUser.findByPk(id);
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            await ApiUser.update({ name, email }, { where: { id } });
+            const updateData = { name, email };
+            if (is_active !== undefined) {
+                updateData.is_active = parseInt(is_active);
+            }
+
+            await ApiUser.update(updateData, { where: { id } });
 
             res.json({ message: "API User updated successfully" });
         } catch (err) {

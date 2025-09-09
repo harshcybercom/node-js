@@ -27,6 +27,7 @@ function editApiUser(user) {
     form.querySelector('input[name="email"]').value = user.email;
     form.querySelector('input[name="password"]').value = '';
     form.querySelector('input[name="password"]').required = false;
+    form.querySelector('select[name="is_active"]').value = user.is_active;
     document.getElementById('formContainer').style.display = 'block';
 }
 
@@ -39,7 +40,8 @@ document.getElementById('apiUserForm').onsubmit = async (e) => {
     const form = e.target;
     const data = {
         name: form.querySelector('input[name="name"]').value,
-        email: form.querySelector('input[name="email"]').value
+        email: form.querySelector('input[name="email"]').value,
+        is_active: form.querySelector('select[name="is_active"]').value
     };
 
     const password = form.querySelector('input[name="password"]').value;

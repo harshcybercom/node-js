@@ -56,7 +56,17 @@
           <% for (const key in cols) { const col = cols[key]; %>
             <th>
               <% if (col.filtrable) { %>
-                <input type="text" name="filter[<%= col.column_name %>]" value="<%= pagination.filters[col.column_name] || '' %>" />
+                <% if (col.type === 'dropdown' && col.options) { %>
+                  <select name="filter[<%= col.column_name %>]">
+                    <% col.options.forEach(option => { %>
+                      <option value="<%= option.value %>" <%= (pagination.filters[col.column_name] || '') === option.value ? 'selected' : '' %>>
+                        <%= option.label %>
+                      </option>
+                    <% }) %>
+                  </select>
+                <% } else { %>
+                  <input type="text" name="filter[<%= col.column_name %>]" value="<%= pagination.filters[col.column_name] || '' %>" />
+                <% } %>
               <% } %>
             </th>
           <% } %>
