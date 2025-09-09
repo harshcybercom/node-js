@@ -1,0 +1,103 @@
+<% 
+  const cols = model.columns(); 
+  const rows = model.rows(); 
+  const pagination = {
+    page: model.page(),
+    per_page: model.perPage(),
+    total_record: model.totalRecord(),
+    total_page: model.totalPage(),
+    per_page_options: model.perPageOptions(),
+    sort_column: model.sortColumn(),
+    sort_direction: model.sortDirection(),
+    filters: model.filters()
+  };
+%>
+
+<div class="table-wrapper">
+
+  <!-- Per Page Selector -->
+  <form method="GET">
+    <label>Rows per page:</label>
+    <select name="per_page" onchange="this.form.submit()">
+      <% pagination.per_page_options.forEach(option => { %>
+        <option value="<%= option %>" <%= option === pagination.per_page ? 'selected' : '' %>>
+          <%= option %>
+        </option>
+      <% }) %>
+    </select>
+  </form>
+
+  <!-- Table -->
+  <form method="GET">
+    <table>
+      <thead>
+        <tr>
+          <% for (const key in cols) { 
+               const col = cols[key]; 
+               const isSorted = pagination.sort_column === col.column_name;
+               const dir = isSorted ? pagination.sort_direction : null;
+               const newDir = dir === "ASC" ? "DESC" : "ASC"; 
+          %>
+            <th>
+              <% if (col.sortable) { %>
+                <a href="?sort_column=<%= col.column_name %>&sort_direction=<%= newDir %>&per_page=<%= pagination.per_page %>">
+                  <%= col.label %>
+                  <% if (isSorted) { %>
+                    <%= dir === "ASC" ? "↑" : "↓" %>
+                  <% } %>
+                </a>
+              <% } else { %>
+                <%= col.label %>
+              <% } %>
+            </th>
+          <% } %>
+        </tr>
+        <tr>
+          <% for (const key in cols) { const col = cols[key]; %>
+            <th>
+              <% if (col.filtrable) { %>
+                <input type="text" name="filter[<%= col.column_name %>]" value="<%= pagination.filters[col.column_name] || '' %>" />
+              <% } %>
+            </th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (rows && rows.length > 0) { %>
+          <% rows.forEach(row => { %>
+            <tr>
+              <% for (const key in cols) { %>
+                <% if (key === 'actions') { %>
+                  <td><%- row[key] %></td>
+                <% } else { %>
+                  <td><%= row[key] %></td>
+                <% } %>
+              <% } %>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr><td colspan="<%= Object.keys(cols).length %>">No records</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+    <button type="submit">Apply Filters</button>
+    <a href="?">Reset</a>
+  </form>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <% if (pagination.page > 1) { %>
+      <a href="?page=<%= pagination.page - 1 %>&per_page=<%= pagination.per_page %>">&laquo; Prev</a>
+    <% } %>
+    <% for (let i = 1; i <= pagination.total_page; i++) { %>
+      <% if (i === pagination.page) { %>
+        <span><%= i %></span>
+      <% } else { %>
+        <a href="?page=<%= i %>&per_page=<%= pagination.per_page %>"><%= i %></a>
+      <% } %>
+    <% } %>
+    <% if (pagination.page < pagination.total_page) { %>
+      <a href="?page=<%= pagination.page + 1 %>&per_page=<%= pagination.per_page %>">Next &raquo;</a>
+    <% } %>
+  </div>
+</div>

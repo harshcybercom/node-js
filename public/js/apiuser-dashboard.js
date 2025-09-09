@@ -1,28 +1,12 @@
-async function fetchApiUsers() {
-    const res = await fetch('/apiuser/users');
-    const data = await res.json();
-    const tbody = document.querySelector('#apiUsersTable tbody');
-    tbody.innerHTML = '';
-    data.users.forEach(user => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${user.id}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${new Date(user.createdAt).toLocaleString()}</td>
-                <td class="actions">
-                    <button onclick='editApiUser(${JSON.stringify(user)})'>Edit</button>
-                    <button onclick='deleteApiUser(${user.id})'>Delete</button>
-                </td>
-            </tr>
-        `;
-    });
+// Function to refresh the page after operations
+function refreshPage() {
+    window.location.reload();
 }
 
 async function deleteApiUser(id) {
     if (confirm("Delete this API user?")) {
         await fetch(`/apiuser/users/${id}`, { method: 'DELETE' });
-        fetchApiUsers();
+        refreshPage();
     }
 }
 
@@ -77,7 +61,5 @@ document.getElementById('apiUserForm').onsubmit = async (e) => {
     }
 
     hideForm();
-    fetchApiUsers();
+    refreshPage();
 };
-
-fetchApiUsers();
