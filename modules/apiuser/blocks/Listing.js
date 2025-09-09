@@ -162,10 +162,18 @@ class ApiUserListing extends Listing {
                     email: row.email,
                     is_active: row.is_active === 1 ? 'Yes' : 'No',
                     createdAt: new Date(row.createdAt).toLocaleString(),
-                    actions: `
-                        <button type="button" onclick='editApiUser(${JSON.stringify({id: row.id, name: row.name, email: row.email, is_active: row.is_active})})' class="btn btn-sm btn-primary">Edit</button>
-                        <button type="button" onclick='deleteApiUser(${row.id})' class="btn btn-sm btn-danger">Delete</button>
-                    `
+                    actions: [
+                        {
+                            label: 'Edit',
+                            onclick: `editApiUser(${JSON.stringify({id: row.id, name: row.name, email: row.email, is_active: row.is_active})})`,
+                            class: 'btn btn-sm btn-primary'
+                        },
+                        {
+                            label: 'Delete',
+                            onclick: `deleteApiUser(${row.id})`,
+                            class: 'btn btn-sm btn-danger'
+                        }
+                    ]
                 };
             });
         }

@@ -78,7 +78,15 @@
             <tr>
               <% for (const key in cols) { %>
                 <% if (key === 'actions') { %>
-                  <td><%- row[key] %></td>
+                  <td>
+                    <% if (row.actions && Array.isArray(row.actions)) { %>
+                      <% row.actions.forEach(action => { %>
+                        <button type="button" onclick="<%= action.onclick %>" class="<%= action.class || 'btn btn-sm' %>"><%= action.label %></button>
+                      <% }) %>
+                    <% } else if (row.actions) { %>
+                      <%- row.actions %>
+                    <% } %>
+                  </td>
                 <% } else { %>
                   <td><%= row[key] %></td>
                 <% } %>
