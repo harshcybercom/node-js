@@ -32,9 +32,9 @@ class Ccc {
         this.app.set('view engine', 'ejs');
         // this.app.set('views', path.join(__dirname, 'modules/admin/views'));
         this.app.set("views", [
+            path.join(__dirname, "modules/apiuser/views"),
             path.join(__dirname, "modules/core/views"),
             // path.join(__dirname, "modules/admin/views"),
-            path.join(__dirname, "modules/apiuser/views"),
         ]);
 
         // Static assets (css/js/images)

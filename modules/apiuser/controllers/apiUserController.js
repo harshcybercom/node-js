@@ -4,7 +4,7 @@ const ApiUser = require("../models/ApiUser");
 const ApiUserToken = require("../models/ApiUserToken");
 const LoginBlock = require("../blocks/Login");
 const RegisterBlock = require("../blocks/Register");
-const DashboardBlock = require("../blocks/Dashboard");
+const ListingBlock = require("../blocks/Listing");
 const Controller = require("../../core/controllers/controller");
 
 class ApiUserController extends Controller {
@@ -229,7 +229,7 @@ class ApiUserController extends Controller {
     }
 
     // GET /apiuser/dashboard
-    async dashboard(req, res) {
+    async listing(req, res) {
         if (!req.session.apiUserId) {
             return res.redirect("/apiuser/login");
         }
@@ -239,12 +239,11 @@ class ApiUserController extends Controller {
                 attributes: { exclude: ['password'] }
             });
 
-            // console.log('controller');
             const layout = this.layout();
             const content = layout.child("content");
 
-            const dashboardBlock = this.block(DashboardBlock, { user });
-            content.child("dashboard", dashboardBlock);
+            const listingBlock = this.block(ListingBlock, { user });
+            content.child("listing", listingBlock);
 
             layout.setTitle("Dashboard - API User");
             layout.addScript("/js/apiuser-dashboard.js");

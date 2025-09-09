@@ -27,7 +27,7 @@ router.post("/register", (req, res) => {
 // router.get("/dashboard", ApiUserController.dashboard);
 router.get("/dashboard", (req, res) => {
     const controller = new ApiUserController(req, res);
-    controller.dashboard(req, res);
+    controller.listing(req, res);
 });
 router.get("/logout", (req, res) => {
     const controller = new ApiUserController(req, res);
